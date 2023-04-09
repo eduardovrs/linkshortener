@@ -15,7 +15,7 @@
 
 ```sh
 // Clone this repository
-git clone https://github.com/eduardovrs/imhere.git
+git clone git@github.com:eduardovrs/linkshortener.git
 
 // Install all dependencies
 yarn install
