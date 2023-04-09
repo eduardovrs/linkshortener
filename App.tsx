@@ -19,6 +19,7 @@ import {
   ShortenedLinksName,
   TextContainer,
   ShareContainer,
+  ShortHistoryTile,
 } from './styles';
 import {IShortenedLinksProps} from './App.structure';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -31,6 +32,8 @@ function App() {
   const [url, setUrl] = React.useState<string>('');
   const [name, setName] = React.useState<string>('');
   const [isLoading, setiIsLoading] = React.useState<boolean>(false);
+  const [isValidClipBoard, setIsValidClipBoard] =
+    React.useState<boolean>(false);
   const [isModalOpened, setIsModalOpened] = React.useState<boolean>(false);
   const [state, setState] = React.useState<boolean>(true);
   const [clipBoardURL, setClipBoardURL] = React.useState<string>('');
@@ -124,10 +127,13 @@ function App() {
       currentClipBoard.includes('https://') ||
       currentClipBoard.includes('http://')
     ) {
+      setIsValidClipBoard(true);
+    }
+    if (currentClipBoard !== clipBoardURL && isValidClipBoard) {
       setClipBoardURL(currentClipBoard);
       setIsModalOpened(true);
     }
-  }, []);
+  }, [clipBoardURL, isValidClipBoard]);
 
   React.useEffect(() => {
     getStoredLinkInfo();
@@ -161,7 +167,10 @@ function App() {
           <ShortButtonText>Encurtar</ShortButtonText>
         </ShortButton>
       </ButtonView>
-      <ShortHistory>{shortenedUrl}</ShortHistory>
+      <ShortHistory showsVerticalScrollIndicator={false}>
+        <ShortHistoryTile>Histórico</ShortHistoryTile>
+        {shortenedUrl}
+      </ShortHistory>
       <ClipBoardModal
         isModalOpened={isModalOpened}
         setIsModalOpened={setIsModalOpened}
