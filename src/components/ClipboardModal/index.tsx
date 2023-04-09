@@ -27,7 +27,7 @@ function ClipBoardModal({
         <ModalSubtitle>Gostaria de encurtá-lo?</ModalSubtitle>
         <ButtonView>
           <AcceptButton onPress={onPress}>
-            <ButtonText>Gostaria</ButtonText>
+            <ButtonText>Sim</ButtonText>
           </AcceptButton>
           <DeclineButton onPress={() => setIsModalOpened(false)}>
             <ButtonText>Não, obrigado</ButtonText>
