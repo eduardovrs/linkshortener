@@ -1,111 +1,175 @@
+/* eslint-disable prettier/prettier */
 import React from 'react';
-import type {PropsWithChildren} from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+  Container,
+  LogoView,
+  Logo,
+  InputView,
+  UrlInput,
+  NameInput,
+  ButtonView,
+  ShortButton,
+  ShortButtonText,
+  ShortHistory,
+  CopyButton,
+  CopyIcon,
+  ShareButton,
+  ShareIcon,
+  ShortenedLinks,
+  ShortenedLinksView,
+  ShortenedLinksName,
+  TextContainer,
+  ShareContainer,
+} from './styles';
+import {IShortenedLinksProps} from './App.structure';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import GetUserShortedLinks from './src/services/GetShortedLinksService';
+import Clipboard from '@react-native-community/clipboard';
+import {Share} from 'react-native';
+import ClipBoardModal from './src/components/ClipboardModal';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+function App() {
+  const [url, setUrl] = React.useState<string>('');
+  const [name, setName] = React.useState<string>('');
+  const [isLoading, setiIsLoading] = React.useState<boolean>(false);
+  const [isModalOpened, setIsModalOpened] = React.useState<boolean>(false);
+  const [state, setState] = React.useState<boolean>(true);
+  const [clipBoardURL, setClipBoardURL] = React.useState<string>('');
+  const [shortenedLinks, setShortenedLinks] = React.useState<
+    IShortenedLinksProps[]
+  >([]);
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
+  const storeLinkInfo = React.useCallback(
+    async (info: IShortenedLinksProps) => {
+      try {
+        const storedData = await AsyncStorage.getItem('@LINKINFO');
+        const storedinfo = storedData ? JSON.parse(storedData) : [];
+        const formatedStoredInfo = [...storedinfo, info];
+        await AsyncStorage.setItem(
+          '@LINKINFO',
+          JSON.stringify(formatedStoredInfo),
+        );
+        setName('');
+        setUrl('');
+        setState(!state);
+      } catch (error) {
+        console.log('AsyncStorage setInfo error', error);
+      }
+    },
+    [state],
   );
-}
 
-function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  const getStoredLinkInfo = React.useCallback(async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('@LINKINFO');
+      const formattedInfo = jsonValue != null ? JSON.parse(jsonValue) : null;
+      setShortenedLinks(formattedInfo);
+    } catch (error) {
+      console.log('AsyncStorage getInfo error', error);
+    }
+  }, []);
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+  const shortenUrl = React.useCallback(async () => {
+    setiIsLoading(true);
+    try {
+      const response = await GetUserShortedLinks.getShortedLinks(url);
+      if (!response) {
+        setiIsLoading(false);
+        return;
+      }
+      storeLinkInfo({url: response, name: name});
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+    setiIsLoading(false);
+  }, [name, storeLinkInfo, url]);
+
+  const shortenedUrl = React.useMemo(() => {
+    return shortenedLinks?.map(item => {
+      const shareLink = async () => {
+        const shareInfoObj = {
+          message: `Este é seu link encurtado:
+          ${item.name}: ${item.url}`,
+          title: 'LinkShortener',
+        };
+        const result = await Share.share(shareInfoObj, {
+          dialogTitle: 'Link encurtado',
+        });
+        return result;
+      };
+      return (
+        <ShortenedLinksView key={item.name}>
+          <TextContainer>
+            <ShortenedLinksName>{item.name}:</ShortenedLinksName>
+            <ShortenedLinks>{item.url}</ShortenedLinks>
+          </TextContainer>
+          <ShareContainer>
+            <CopyButton onPress={() => Clipboard.setString(item.url)}>
+              <CopyIcon name={'copy'} size={20} />
+            </CopyButton>
+            <ShareButton onPress={shareLink}>
+              <ShareIcon name={'share-alt'} size={20} />
+            </ShareButton>
+          </ShareContainer>
+        </ShortenedLinksView>
+      );
+    });
+  }, [shortenedLinks]);
+
+  const teste = React.useCallback(async () => {
+    const currentClipBoard = await Clipboard.getString();
+    if (
+      currentClipBoard.includes('https://') ||
+      currentClipBoard.includes('http://')
+    ) {
+      setClipBoardURL(currentClipBoard);
+      setIsModalOpened(true);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    getStoredLinkInfo();
+    teste();
+  }, [getStoredLinkInfo, state, teste]);
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
+    <Container>
+      <LogoView>
+        <Logo source={require('./src/assets/LinkShortener.png')} />
+      </LogoView>
+      <InputView>
+        <UrlInput
+          value={url}
+          placeholder={'Digite a URL a ser encurtada'}
+          placeHolderTexrColor="#393939"
+          onChangeText={(text: string) => setUrl(text)}
+        />
+        <NameInput
+          value={name}
+          placeholder={'Digite um nome para essa URL'}
+          placeHolderTexrColor="#393939"
+          onChangeText={(text: string) => setName(text)}
+        />
+      </InputView>
+      <ButtonView>
+        <ShortButton
+          onPress={() => {
+            shortenUrl();
           }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+          <ShortButtonText>Encurtar</ShortButtonText>
+        </ShortButton>
+      </ButtonView>
+      <ShortHistory>{shortenedUrl}</ShortHistory>
+      <ClipBoardModal
+        isModalOpened={isModalOpened}
+        setIsModalOpened={setIsModalOpened}
+        onPress={() => {
+          setUrl(clipBoardURL);
+        }}
+      />
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;
