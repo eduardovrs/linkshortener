@@ -64,7 +64,16 @@ export const ShortButtonText = styled.Text`
 
 export const ShortHistory = styled.ScrollView`
   background-color: #000000;
-  width: 85%;
+  width: 95%;
+`;
+
+export const ShortHistoryTile = styled.Text`
+  text-align: center;
+  font-size: 24px;
+  align-self: center;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 3%;
 `;
 
 export const ShortenedLinksView = styled.View`
@@ -76,7 +85,7 @@ export const ShortenedLinksView = styled.View`
 `;
 
 export const ShortenedLinksName = styled.Text`
-  height: 30px;
+  width: 50%;
   text-align: center;
   font-size: 16px;
   align-self: center;
@@ -86,7 +95,6 @@ export const ShortenedLinksName = styled.Text`
 `;
 
 export const ShortenedLinks = styled.Text`
-  height: 30px;
   text-align: center;
   font-size: 16px;
   align-self: center;
