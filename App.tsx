@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React from 'react';
 import {
   Container,
@@ -70,19 +69,21 @@ function App() {
   }, []);
 
   const shortenUrl = React.useCallback(async () => {
-    setiIsLoading(true);
-    try {
-      const response = await GetUserShortedLinks.getShortedLinks(url);
-      if (!response) {
-        setiIsLoading(false);
+    if (url.includes('https://') || url.includes('http://')) {
+      setiIsLoading(true);
+      try {
+        const response = await GetUserShortedLinks.getShortedLinks(url);
+        if (!response) {
+          setiIsLoading(false);
+          return;
+        }
+        storeLinkInfo({url: response, name: name});
+      } catch (error) {
+        console.log(error);
         return;
       }
-      storeLinkInfo({url: response, name: name});
-    } catch (error) {
-      console.log(error);
-      return;
+      setiIsLoading(false);
     }
-    setiIsLoading(false);
   }, [name, storeLinkInfo, url]);
 
   const shortenedUrl = React.useMemo(() => {
@@ -117,7 +118,7 @@ function App() {
     });
   }, [shortenedLinks]);
 
-  const teste = React.useCallback(async () => {
+  const getUserCurrentClipBoard = React.useCallback(async () => {
     const currentClipBoard = await Clipboard.getString();
     if (
       currentClipBoard.includes('https://') ||
@@ -130,8 +131,8 @@ function App() {
 
   React.useEffect(() => {
     getStoredLinkInfo();
-    teste();
-  }, [getStoredLinkInfo, state, teste]);
+    getUserCurrentClipBoard();
+  }, [getStoredLinkInfo, state, getUserCurrentClipBoard]);
 
   return (
     <Container>
@@ -166,6 +167,7 @@ function App() {
         setIsModalOpened={setIsModalOpened}
         onPress={() => {
           setUrl(clipBoardURL);
+          setIsModalOpened(false);
         }}
       />
     </Container>
