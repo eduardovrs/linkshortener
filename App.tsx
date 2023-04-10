@@ -94,7 +94,7 @@ function App() {
       const shareLink = async () => {
         const shareInfoObj = {
           message: `Este é seu link encurtado:
-          ${item.name}: ${item.url}`,
+          ${item.name} - ${item.url}`,
           title: 'LinkShortener',
         };
         const result = await Share.share(shareInfoObj, {
