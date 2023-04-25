@@ -31,6 +31,7 @@ export const UrlInput = styled.TextInput`
   background-color: #ffffff;
   border-radius: 8px;
   font-size: 16px;
+  padding: 3%;
 `;
 
 export const NameInput = styled.TextInput`
@@ -39,6 +40,7 @@ export const NameInput = styled.TextInput`
   background-color: #ffffff;
   border-radius: 8px;
   font-size: 16px;
+  padding: 3%;
 `;
 
 export const ButtonView = styled.View`
@@ -80,12 +82,11 @@ export const ShortenedLinksView = styled.View`
   flex-direction: row;
   background-color: #ffffff;
   margin-bottom: 5%;
-  justify-content: space-between;
   border-radius: 8px;
 `;
 
 export const ShortenedLinksName = styled.Text`
-  width: 50%;
+  width: 40%;
   text-align: center;
   font-size: 16px;
   align-self: center;
@@ -121,9 +122,19 @@ export const ShareIcon = styled(FontAwesome5)`
   color: #000000;
 `;
 
+export const DeleteButton = styled.TouchableOpacity`
+  height: 40px;
+  justify-content: center;
+  margin-right: 5%;
+`;
+
+export const DeleteIcon = styled(FontAwesome5)`
+  color: #000000;
+`;
+
 export const TextContainer = styled.View`
   flex-direction: row;
-  width: 80%;
+  width: 75%;
 `;
 
 export const ShareContainer = styled.View`
