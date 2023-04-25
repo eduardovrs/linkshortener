@@ -8,6 +8,8 @@ export const ContainerModal = styled.View`
   border-top-left-radius: 16px;
   flex-direction: column;
   top: 60%;
+  justify-content: center;
+  align-items: center;
 `;
 
 export const ModalTitle = styled.Text`
@@ -23,6 +25,8 @@ export const UrlText = styled.Text`
   font-weight: 500;
   margin: 5% 0 5% 0;
   color: #409eff;
+  align-self: center;
+  text-align: center;
 `;
 
 export const ModalSubtitle = styled.Text`
