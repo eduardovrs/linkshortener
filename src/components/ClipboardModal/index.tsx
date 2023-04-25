@@ -9,11 +9,13 @@ import {
   ButtonView,
   DeclineButton,
   ButtonText,
+  UrlText,
 } from './styles';
 
 function ClipBoardModal({
   isModalOpened,
   setIsModalOpened,
+  clipBoardURL,
   onPress,
 }: IClipBoardModalProps) {
   return (
@@ -24,6 +26,7 @@ function ClipBoardModal({
       onRequestClose={() => setIsModalOpened(false)}>
       <ContainerModal>
         <ModalTitle>Opa, encontramos um link copiado.</ModalTitle>
+        <UrlText numberOfLines={1}>{clipBoardURL}</UrlText>
         <ModalSubtitle>Gostaria de encurtá-lo?</ModalSubtitle>
         <ButtonView>
           <AcceptButton onPress={onPress}>
