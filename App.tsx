@@ -75,12 +75,12 @@ function App() {
   }, []);
 
   const removeStoredLink = React.useCallback(
-    async (linkName: string) => {
+    async (linkUrl: string) => {
       const jsonValue = await AsyncStorage.getItem('@LINKINFO');
       const previousLinks = jsonValue ? JSON.parse(jsonValue) : [];
 
       const removeLink = previousLinks.filter(
-        (link: IShortenedLinksProps) => link.name !== linkName,
+        (link: IShortenedLinksProps) => link.url !== linkUrl,
       );
       await AsyncStorage.setItem('@LINKINFO', JSON.stringify(removeLink));
       setShortenedLinks(removeLink);
@@ -90,6 +90,7 @@ function App() {
   );
 
   const shortenUrl = React.useCallback(async () => {
+    setShouldShowError(false);
     setiIsLoading(true);
     try {
       const response = await GetUserShortedLinks.getShortedLinks(url);
@@ -128,7 +129,7 @@ function App() {
         return result;
       };
       return (
-        <ShortenedLinksView key={item.name}>
+        <ShortenedLinksView key={item.url}>
           <TextContainer>
             <ShortenedLinksName numberOfLines={1}>
               {item.name}:
@@ -142,7 +143,7 @@ function App() {
             <ShareButton onPress={shareLink}>
               <ShareIcon name={'share-alt'} size={20} />
             </ShareButton>
-            <DeleteButton onPress={() => removeStoredLink(item.name)}>
+            <DeleteButton onPress={() => removeStoredLink(item.url)}>
               <DeleteIcon name={'trash'} size={20} />
             </DeleteButton>
           </ShareContainer>
@@ -160,7 +161,7 @@ function App() {
     ) {
       setIsValidClipBoard(true);
     }
-    if (currentClipBoard !== clipBoardURL && isValidClipBoard) {
+    if (isValidClipBoard && currentClipBoard !== clipBoardURL) {
       setClipBoardURL(currentClipBoard);
       setIsModalOpened(true);
     }
