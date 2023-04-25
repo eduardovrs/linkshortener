@@ -90,13 +90,12 @@ export const ShortenedLinksName = styled.Text`
   text-align: center;
   font-size: 16px;
   align-self: center;
-  margin: 0 3% 0 3%;
+  margin: 0 0 0 3%;
   font-weight: bold;
   color: #000000;
 `;
 
 export const ShortenedLinks = styled.Text`
-  text-align: center;
   font-size: 16px;
   align-self: center;
   color: #5271ff;
@@ -125,7 +124,6 @@ export const ShareIcon = styled(FontAwesome5)`
 export const DeleteButton = styled.TouchableOpacity`
   height: 40px;
   justify-content: center;
-  margin-right: 5%;
 `;
 
 export const DeleteIcon = styled(FontAwesome5)`
